@@ -11,70 +11,65 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-class Course extends Table{
+public class Takes extends Table {
 
-	Scene courseScene;
+	Scene TakeScene;
 	Scene insertRecordScene;
 	Scene deleteRecordScene;
-	Scene courseView;
-	TableView<CourseData> table;
+	Scene ViewTakes;
 
-	/**Constructor to make course scene ready for insertion and deletion*/
-	Course(){
+	TableView<TakesData> table;
+
+	Takes(){
 		setScene();
-		setCourseView();
+		setViewDataScene();
 		setInsertRecordScene();
 		setDeleteRecordScene();
-		insertionQuery = "INSERT INTO Course VALUES (?, ?, ?, ?)";
-		deletionQuery = "DELETE FROM Course WHERE course_id = ?";
+		insertionQuery = "INSERT INTO Takes VALUES (?, ?, ?)";
+		deletionQuery = "DELETE FROM Takes WHERE course_id = ? and s_id = ?";
 	}
 
-
 	/**
-	 * Sets the scene for updating course table.
-	 * This scene appears when the courseButton is clicked.
+	 * Sets the scene for updating student table.
+	 * This scene appears when the departmentButton is clicked.
 	 * */
 	void setScene(){
+
 		//Setting insertRecord button.
 		insertRecord.setOnAction(e->Controller.stage.setScene(insertRecordScene));
 		deleteRecord.setOnAction(e->Controller.stage.setScene(deleteRecordScene));
 
-		label.setText(" Update\n Course\n Table");
-		courseScene = new Scene(hBox, Controller.WIDTH, Controller.HEIGHT);
+		label.setText(" Update\n Student's \n Courses");
+		TakeScene = new Scene(hBox, Controller.WIDTH, Controller.HEIGHT);
 
 	}//End of method setCourseScene.
 
 
 	/**
-	 * Sets the scene for inserting a record into the course table.
-	 * This scene appears when insertRecord button is clicked in course scene.
+	 * Sets the scene for inserting a record into the takes table.
+	 * This scene appears when insertRecord button is clicked in takes scene.
 	 * */
 	void setInsertRecordScene(){
 
-		Label[] labels = new Label[4];
-		labels[0] = new Label("Course Name");
-		labels[1] = new Label("Course Id");
-		labels[2] = new Label("Dept ID");
-		labels[3] = new Label("Instructor-ID");
+		Label[] labels = new Label[3];
+		labels[0] = new Label("Student ID");
+		labels[1] = new Label("Course ID");
+		labels[2] = new Label("Attendance");
 
 		for(int i=0;i<labels.length;i++){
 			labels[i].setTextFill(Color.GOLD);
 		}
 
-		TextField [] fields = new TextField[4];
+		TextField [] fields = new TextField[3];
 
-		for(int i =0; i< fields.length ; i++){
+		for(int i = 0; i< fields.length ; i++){
 			fields[i] = new TextField();
 			fields[i].setPrefColumnCount(15);
 		}
@@ -82,7 +77,7 @@ class Course extends Table{
 		Button back = new Button("Back");
 		back.setMinWidth(200);
 		back.setMinHeight(35);
-		back.setOnAction(e->Controller.stage.setScene(courseScene));
+		back.setOnAction(e->Controller.stage.setScene(TakeScene));
 
 		submit.setOnAction(e ->{
 			try {
@@ -112,29 +107,41 @@ class Course extends Table{
 		grid1.add(labels[2], 0,2);
 		grid1.add(fields[2], 1,2);
 
-		grid2.add(labels[3], 0, 0);
-		grid2.add(fields[3], 1, 0 );
+		grid2.add(submit, 0, 0);
+		grid2.add(back, 0, 2);
+		grid2.add(clear, 0, 1);
+		hbox1.setSpacing(25);
 
-		formVbox.getChildren().addAll(submit, clear, back);
 		insertRecordScene = new Scene(formVbox, Controller.WIDTH, Controller.HEIGHT);
 
 	}
 
 
 	/**
-	 * Sets the scene for deleting a record from course table.
-	 * This scene appears when deleteRecord button is clicked in course scene.
+	 * Sets the scene for deleting a record from takes table.
+	 * This scene appears when deleteRecord button is clicked in takes scene.
 	 * */
 	void setDeleteRecordScene(){
-		Label label = new Label("Course-ID");
-		label.setTextFill(Color.GOLD);
-		TextField field = new TextField();
-		field.setPrefColumnCount(15);
 
+		Label[] labels = new Label[2];
+		labels[0] = new Label("Student ID");
+		labels[1] = new Label("Course ID");
+
+		for(int i=0;i<labels.length;i++){
+			labels[i].setTextFill(Color.GOLD);
+		}
+
+		TextField [] fields = new TextField[2];
+
+		for(int i = 0; i< fields.length ; i++){
+			fields[i] = new TextField();
+			fields[i].setPrefColumnCount(15);
+		}
+		
 		HBox hBox = new HBox(15);
 		hBox.setAlignment(Pos.CENTER);
 		hBox.setTranslateY(-35);
-		hBox.getChildren().addAll(label, field);
+		hBox.getChildren().addAll(labels[0], fields[0], labels[1], fields[1]);
 
 		Button delete = new Button("Delete Record");
 		Button clear = new Button("Clear");
@@ -150,7 +157,7 @@ class Course extends Table{
 		delete.setOnAction(e->{
 			try{
 				deletionMessage.setText("");
-				delete(field);
+				delete(fields);
 				deletionMessage.setTextFill(Color.GREEN);
 				deletionMessage.setText("Record Deleted");
 			}
@@ -162,11 +169,12 @@ class Course extends Table{
 		});
 
 		clear.setOnAction(e->{
-			field.setText("");
+			fields[0].setText("");
+			fields[1].setText("");
 			deletionMessage.setText("");
 		});
 
-		back.setOnAction(e->Controller.stage.setScene(courseScene));
+		back.setOnAction(e->Controller.stage.setScene(TakeScene));
 
 		deletionMessage.setTranslateY(-40);
 
@@ -181,28 +189,26 @@ class Course extends Table{
 
 
 	/**
-	 * Sets the scene for viewing course table.*/
-	void setCourseView(){
+	 * Sets the scene for viewing takes table.*/
+	void setViewDataScene(){
 
-		TableColumn<CourseData, String> column1 = new TableColumn<>("Course Name");
-		column1.setCellValueFactory(new PropertyValueFactory<>("CourseName"));
-		TableColumn<CourseData, String> column2 = new TableColumn<>("Course ID");
-		column2.setCellValueFactory(new PropertyValueFactory<>("CourseId"));
-		TableColumn<CourseData, String> column3 = new TableColumn<>("Department ID");
-		column3.setCellValueFactory(new PropertyValueFactory<>("DepartmentId"));
-		TableColumn<CourseData, String> column4 = new TableColumn<>("Instructor ID");
-		column4.setCellValueFactory(new PropertyValueFactory<>("InstructorId"));
+		TableColumn<TakesData, String> column1 = new TableColumn<>("Student Name");
+		column1.setCellValueFactory(new PropertyValueFactory<>("sname"));
 
-		column1.setPrefWidth(150);
-		column2.setPrefWidth(150);
-		column3.setPrefWidth(150);
-		column4.setPrefWidth(150);
+		TableColumn<TakesData, String> column2 = new TableColumn<>("Course");
+		column2.setCellValueFactory(new PropertyValueFactory<>("cname"));
+
+		TableColumn<TakesData, String> column3 = new TableColumn<>("Instructor");
+		column3.setCellValueFactory(new PropertyValueFactory<>("ins_name"));
+
+		TableColumn<TakesData, String> column4 = new TableColumn<>("Department");
+		column4.setCellValueFactory(new PropertyValueFactory<>("dept_name"));
 
 		table = new TableView<>();
-		table.setMaxSize(600, 300);
+		table.setMaxSize(600,300);
 
 		table.setItems(getData());
-		table.getColumns().addAll(column1,column2,column3,column4);
+		table.getColumns().addAll(column1, column2, column3, column4);
 
 		Button back = new Button("Back");
 		back.setMaxHeight(35);
@@ -214,21 +220,26 @@ class Course extends Table{
 		vbox.getChildren().addAll(table, back);
 		vbox.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY,Insets.EMPTY)));
 
-		courseView = new Scene(vbox, Controller.WIDTH, Controller.HEIGHT);
+		ViewTakes = new Scene(vbox, Controller.WIDTH, Controller.HEIGHT);
+
 	}
 
 
-	/**Returns the records of course table in an observable list.*/
-	public ObservableList<CourseData> getData(){
-		ObservableList<CourseData> list = FXCollections.observableArrayList();
+	/**Returns the records of student course info in an observable list.*/
+	public ObservableList<TakesData> getData(){
+		ObservableList<TakesData> list = FXCollections.observableArrayList();
 		try {
 			Statement st = Controller.connection.createStatement();
-			ResultSet rs = st.executeQuery("SELECT * FROM Course");
 
-			while(rs.next()){
-				list.add(new CourseData(rs.getString(1), rs.getString(2)
-						,rs.getString(3), rs.getString(4)));
+			ResultSet rs = st.executeQuery("SELECT sname, cname, ins_name as instructor, dept_name FROM student"
+					+ " INNER JOIN takes ON student.s_id = takes.s_id"
+					+ " INNER JOIN course ON course.course_id = takes.course_id"
+					+ " INNER JOIN instructor ON course.instructor_id = instructor.instructor_id"
+					+ " INNER JOIN department ON instructor.dept_id = department.dept_id");
 
+			while(rs.next()) {
+				list.add(new TakesData(rs.getString(1), rs.getString(2),
+						rs.getString(3), rs.getString(4)));
 			}
 
 		}
@@ -240,5 +251,23 @@ class Course extends Table{
 	}
 
 
+	/**To delete a record from a table.*/
+	private void delete(TextField[] fields) throws SQLException{
+		statement = Controller.connection.prepareStatement(deletionQuery);
+		for(int i = 0; i<fields.length;i++) {
+			if(!fields[i].getText().isEmpty()) {
+				statement.setString(i+1, fields[i].getText());
+			}
+			else
+				throw new SQLException("Required Empty Field");
 
-}//End of class Course.
+			fields[i].setText("");
+		}
+		statement.executeUpdate();
+
+		System.out.println("Record Deleted");
+
+	}//End of method delete.
+
+
+}//End of class Instructor.

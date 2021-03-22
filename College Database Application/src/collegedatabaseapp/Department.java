@@ -11,70 +11,66 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-class Course extends Table{
+public class Department extends Table {
 
-	Scene courseScene;
+	Scene departmentScene;
 	Scene insertRecordScene;
 	Scene deleteRecordScene;
-	Scene courseView;
-	TableView<CourseData> table;
+	Scene ViewDepartment;
 
-	/**Constructor to make course scene ready for insertion and deletion*/
-	Course(){
+	TableView<DepartmentData> table;
+
+	/**Constructor to make department scene ready for insertion and deletion*/
+	Department(){
 		setScene();
-		setCourseView();
+		setViewDataScene();
 		setInsertRecordScene();
 		setDeleteRecordScene();
-		insertionQuery = "INSERT INTO Course VALUES (?, ?, ?, ?)";
-		deletionQuery = "DELETE FROM Course WHERE course_id = ?";
+		insertionQuery = "INSERT INTO Department VALUES (?, ?, ?)";
+		deletionQuery = "DELETE FROM Department WHERE dept_id = ?";
 	}
 
 
 	/**
-	 * Sets the scene for updating course table.
-	 * This scene appears when the courseButton is clicked.
+	 * Sets the scene for updating department table.
+	 * This scene appears when the departmentButton is clicked.
 	 * */
 	void setScene(){
+
 		//Setting insertRecord button.
 		insertRecord.setOnAction(e->Controller.stage.setScene(insertRecordScene));
 		deleteRecord.setOnAction(e->Controller.stage.setScene(deleteRecordScene));
 
-		label.setText(" Update\n Course\n Table");
-		courseScene = new Scene(hBox, Controller.WIDTH, Controller.HEIGHT);
+		label.setText(" Update\n Department\n Table");
+		departmentScene = new Scene(hBox, Controller.WIDTH, Controller.HEIGHT);
 
 	}//End of method setCourseScene.
 
 
 	/**
-	 * Sets the scene for inserting a record into the course table.
-	 * This scene appears when insertRecord button is clicked in course scene.
+	 * Sets the scene for inserting a record into the department table.
+	 * This scene appears when insertRecord button is clicked in department scene.
 	 * */
 	void setInsertRecordScene(){
 
-		Label[] labels = new Label[4];
-		labels[0] = new Label("Course Name");
-		labels[1] = new Label("Course Id");
-		labels[2] = new Label("Dept ID");
-		labels[3] = new Label("Instructor-ID");
+		Label[] labels = new Label[3];
+		labels[0] = new Label("Department Name");
+		labels[1] = new Label("Department ID");
+		labels[2] = new Label("Instructor ID (Head)");
 
 		for(int i=0;i<labels.length;i++){
 			labels[i].setTextFill(Color.GOLD);
 		}
 
-		TextField [] fields = new TextField[4];
+		TextField [] fields = new TextField[3];
 
-		for(int i =0; i< fields.length ; i++){
+		for(int i = 0; i< fields.length ; i++){
 			fields[i] = new TextField();
 			fields[i].setPrefColumnCount(15);
 		}
@@ -82,7 +78,7 @@ class Course extends Table{
 		Button back = new Button("Back");
 		back.setMinWidth(200);
 		back.setMinHeight(35);
-		back.setOnAction(e->Controller.stage.setScene(courseScene));
+		back.setOnAction(e->Controller.stage.setScene(departmentScene));
 
 		submit.setOnAction(e ->{
 			try {
@@ -112,21 +108,23 @@ class Course extends Table{
 		grid1.add(labels[2], 0,2);
 		grid1.add(fields[2], 1,2);
 
-		grid2.add(labels[3], 0, 0);
-		grid2.add(fields[3], 1, 0 );
+		grid2.add(submit, 0, 0);
+		grid2.add(back, 0, 2);
+		grid2.add(clear, 0, 1);
+		hbox1.setSpacing(25);
 
-		formVbox.getChildren().addAll(submit, clear, back);
 		insertRecordScene = new Scene(formVbox, Controller.WIDTH, Controller.HEIGHT);
 
 	}
 
 
 	/**
-	 * Sets the scene for deleting a record from course table.
-	 * This scene appears when deleteRecord button is clicked in course scene.
+	 * Sets the scene for deleting a record from department table.
+	 * This scene appears when deleteRecord button is clicked in department scene.
 	 * */
 	void setDeleteRecordScene(){
-		Label label = new Label("Course-ID");
+
+		Label label = new Label("Department-ID");
 		label.setTextFill(Color.GOLD);
 		TextField field = new TextField();
 		field.setPrefColumnCount(15);
@@ -166,7 +164,7 @@ class Course extends Table{
 			deletionMessage.setText("");
 		});
 
-		back.setOnAction(e->Controller.stage.setScene(courseScene));
+		back.setOnAction(e->Controller.stage.setScene(departmentScene));
 
 		deletionMessage.setTranslateY(-40);
 
@@ -181,56 +179,58 @@ class Course extends Table{
 
 
 	/**
-	 * Sets the scene for viewing course table.*/
-	void setCourseView(){
+	 * Sets the scene for viewing department table.*/
+	void setViewDataScene(){
 
-		TableColumn<CourseData, String> column1 = new TableColumn<>("Course Name");
-		column1.setCellValueFactory(new PropertyValueFactory<>("CourseName"));
-		TableColumn<CourseData, String> column2 = new TableColumn<>("Course ID");
-		column2.setCellValueFactory(new PropertyValueFactory<>("CourseId"));
-		TableColumn<CourseData, String> column3 = new TableColumn<>("Department ID");
-		column3.setCellValueFactory(new PropertyValueFactory<>("DepartmentId"));
-		TableColumn<CourseData, String> column4 = new TableColumn<>("Instructor ID");
-		column4.setCellValueFactory(new PropertyValueFactory<>("InstructorId"));
+		TableColumn<DepartmentData, String> column1 = new TableColumn<>("Department Name");
+		column1.setCellValueFactory(new PropertyValueFactory<>("DepartmentName"));
 
-		column1.setPrefWidth(150);
-		column2.setPrefWidth(150);
-		column3.setPrefWidth(150);
-		column4.setPrefWidth(150);
+		TableColumn<DepartmentData, String> column2 = new TableColumn<>("Department ID");
+		column2.setCellValueFactory(new PropertyValueFactory<>("DepartmentID"));
+
+		TableColumn<DepartmentData, String> column3 = new TableColumn<>("Head ID");
+		column3.setCellValueFactory(new PropertyValueFactory<>("InstructorID"));
+
+		column1.setPrefWidth(200);
+		column2.setPrefWidth(200);
+		column3.setPrefWidth(200);
+
 
 		table = new TableView<>();
-		table.setMaxSize(600, 300);
+		table.setMaxSize(600,300);
 
 		table.setItems(getData());
-		table.getColumns().addAll(column1,column2,column3,column4);
+		table.getColumns().addAll(column1, column2, column3);
+
 
 		Button back = new Button("Back");
 		back.setMaxHeight(35);
 		back.setMinWidth(200);
-		back.setOnAction(e->Controller.stage.setScene(Controller.mainMenu.getSceneViewData()));
+		back.setOnAction(
+				e->Controller.stage.setScene(Controller.mainMenu.getSceneViewData()));
 
 		VBox vbox = new VBox(10);
 		vbox.setAlignment(Pos.CENTER);
 		vbox.getChildren().addAll(table, back);
 		vbox.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY,Insets.EMPTY)));
 
-		courseView = new Scene(vbox, Controller.WIDTH, Controller.HEIGHT);
+		ViewDepartment = new Scene(vbox, Controller.WIDTH, Controller.HEIGHT);
+
+
 	}
 
 
-	/**Returns the records of course table in an observable list.*/
-	public ObservableList<CourseData> getData(){
-		ObservableList<CourseData> list = FXCollections.observableArrayList();
+	/**Returns the records of department table in an observable list.*/
+	public ObservableList<DepartmentData> getData(){
+		ObservableList<DepartmentData> list = FXCollections.observableArrayList();
 		try {
 			Statement st = Controller.connection.createStatement();
-			ResultSet rs = st.executeQuery("SELECT * FROM Course");
+			ResultSet rs = st.executeQuery("SELECT * FROM Department");
 
-			while(rs.next()){
-				list.add(new CourseData(rs.getString(1), rs.getString(2)
-						,rs.getString(3), rs.getString(4)));
+			while(rs.next()) {
+				list.add(new DepartmentData(rs.getString(1), rs.getString(2), rs.getString(3)));
 
 			}
-
 		}
 		catch(SQLException ex){
 			ex.printStackTrace();
@@ -241,4 +241,4 @@ class Course extends Table{
 
 
 
-}//End of class Course.
+}//End of class Instructor.
